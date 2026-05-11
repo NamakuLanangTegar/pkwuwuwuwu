@@ -1,0 +1,579 @@
+{
+  "uuid": "652f2f9e-5920-4d49-b7a1-3af4ee97c635",
+  "lastMigration": 33,
+  "name": "VATERO TRAVEL",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3000,
+  "hostname": "0.0.0.0",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "a5946121-cf82-4501-875b-5509d4b81799",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "login",
+      "responses": [
+        {
+          "uuid": "27ff4801-57c6-43e3-a621-ed59e070866b",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Login Berhasil\",\r\n  \"data\": {\r\n    \"user_id\": 1,\r\n    \"nama\": \"User Penumpang\",\r\n    \"email\": \"user@example.com\",\r\n    \"token\": \"rahasia_token_123\"\r\n  }\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "6bd73541-c0ba-4f24-9e7d-351df8c3b3f1",
+          "body": "{\r\n  \"status\": \"error\",\r\n  \"message\": \"Email atau Password salah!\",\r\n  \"data\": null\r\n}",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "body",
+              "modifier": "password",
+              "value": "password123",
+              "invert": true,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "a14689d2-0f45-4732-a8cd-85373058532b",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "user/profile",
+      "responses": [
+        {
+          "uuid": "3fc1367a-9486-450f-9610-99647cb4534e",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Data profil berhasil dimuat\",\r\n  \"data\": {\r\n    \"id\": 1,\r\n    \"nama_lengkap\": \"Andi Pratama\",\r\n    \"username\": \"@andipratama\",\r\n    \"email\": \"andi@gmail.com\",\r\n    \"poin\": 1250,\r\n    \"no_telp\": \"08123456789\",\r\n    \"foto_profil\": \"https://ui-avatars.com/api/?name=Andi+Pratama\"\r\n  }\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "8b4ec9b4-8d79-43db-aecd-522fed0d3494",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "travel/list",
+      "responses": [
+        {
+          "uuid": "322be075-87f6-47d9-867c-21d5679b9d26",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Data perjalanan berhasil ditemukan\",\r\n  \"data\": [\r\n    {\r\n      \"id\": 1,\r\n      \"kategori\": \"Bis\",\r\n      \"nama_pu\": \"27 Trans\",\r\n      \"tipe\": \"President Class\",\r\n      \"image\": \"https://blue.kumparan.com/image/upload/v1634025431/bus-27-trans.jpg\",\r\n      \"asal\": \"Malang\",\r\n      \"tujuan\": \"Jakarta\",\r\n      \"berangkat\": \"18:30\",\r\n      \"sampai\": \"06:00\",\r\n      \"harga\": 380000,\r\n      \"harga_formatted\": \"Rp 380.000\",\r\n      \"rating\": 4.9,\r\n      \"sisa_kursi\": 4\r\n    },\r\n    {\r\n      \"id\": 2,\r\n      \"kategori\": \"Travel\",\r\n      \"nama_pu\": \"M-Trans\",\r\n      \"tipe\": \"Hiace Luxury\",\r\n      \"image\": \"https://example.com/mtrans.jpg\",\r\n      \"asal\": \"Malang\",\r\n      \"tujuan\": \"Kediri\",\r\n      \"berangkat\": \"07:00\",\r\n      \"sampai\": \"09:30\",\r\n      \"harga\": 85000,\r\n      \"harga_formatted\": \"Rp 85.000\",\r\n      \"rating\": 4.7,\r\n      \"sisa_kursi\": 8\r\n    },\r\n    {\r\n      \"id\": 3,\r\n      \"kategori\": \"Rental\",\r\n      \"nama_pu\": \"Arbi Rental\",\r\n      \"tipe\": \"Innova Reborn\",\r\n      \"image\": \"https://example.com/innova.jpg\",\r\n      \"asal\": \"Yogyakarta\",\r\n      \"tujuan\": \"Sleman\",\r\n      \"berangkat\": \"08:00\",\r\n      \"sampai\": \"20:00\",\r\n      \"harga\": 650000,\r\n      \"harga_formatted\": \"Rp 650.000\",\r\n      \"rating\": 4.8,\r\n      \"sisa_kursi\": 1\r\n    }\r\n  ]\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "a121b93d-4f0c-41fd-9bce-abadea607849",
+          "body": "{\r\n  \"status\": \"error\",\r\n  \"message\": \"Maaf, jadwal untuk rute ini belum tersedia.\",\r\n  \"data\": null\r\n}",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "tujuan",
+              "value": "Papua",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "76daacdd-5a4f-4a0c-b285-82688cfcf9f0",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "pesanan/history",
+      "responses": [
+        {
+          "uuid": "f227d92b-f1ea-4a46-84db-40c6f512506f",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Data riwayat pesanan ditemukan\",\r\n  \"data\": [\r\n    {\r\n      \"booking_id\": \"VTR-99201\",\r\n      \"nama_pu\": \"27 Trans\",\r\n      \"asal\": \"Malang\",\r\n      \"tujuan\": \"Jakarta\",\r\n      \"tanggal\": \"12 Mei 2024\",\r\n      \"status\": \"Lunas\",\r\n      \"total_bayar\": \"Rp 380.000\"\r\n    },\r\n    {\r\n      \"booking_id\": \"VTR-88102\",\r\n      \"nama_pu\": \"M-Trans\",\r\n      \"asal\": \"Malang\",\r\n      \"tujuan\": \"Kediri\",\r\n      \"tanggal\": \"05 Mei 2024\",\r\n      \"status\": \"Batal\",\r\n      \"total_bayar\": \"Rp 85.000\"\r\n    }\r\n  ]\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "9e4e5aff-a7db-46c6-b4ee-aba75447cdf5",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "user/messages",
+      "responses": [
+        {
+          "uuid": "d5d855ca-6507-48d4-8c7b-23c5f6b67834",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Data notifikasi berhasil dimuat\",\r\n  \"data\": [\r\n    {\r\n      \"id\": 1,\r\n      \"judul\": \"Pembayaran Berhasil\",\r\n      \"isi\": \"Tiket 27 Trans kamu sudah aktif. Selamat menikmati perjalanan!\",\r\n      \"waktu\": \"2 jam yang lalu\",\r\n      \"is_read\": false\r\n    },\r\n    {\r\n      \"id\": 2,\r\n      \"judul\": \"Promo Hari Ini\",\r\n      \"isi\": \"Gunakan kode VATEROMERDEKA untuk diskon 20% hari ini saja!\",\r\n      \"waktu\": \"1 hari yang lalu\",\r\n      \"is_read\": true\r\n    }\r\n  ]\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "4d296022-b119-48f2-8fc5-83eb70e1c626",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "register",
+      "responses": [
+        {
+          "uuid": "a7de5aaa-046d-49bc-8081-9e9a7ae480b2",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Akun berhasil dibuat! Silakan login.\",\r\n  \"data\": {\r\n    \"user_id\": 101,\r\n    \"username\": \"user_baru\"\r\n  }\r\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "cf833ac1-b5d6-43fa-911f-02dc4d96b626",
+          "body": "{\r\n  \"status\": \"error\",\r\n  \"message\": \"Email sudah terdaftar! Gunakan email lain.\",\r\n  \"data\": null\r\n}",
+          "latency": 0,
+          "statusCode": 409,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "body",
+              "modifier": "email",
+              "value": "admin@gmail.com",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "6188934d-dafd-4e5f-9296-7e91e8762a96",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "travel/seats",
+      "responses": [
+        {
+          "uuid": "0b05156f-9dea-4268-8b9f-c2fb5baa69da",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Data kursi berhasil dimuat\",\r\n  \"data\": {\r\n    \"travel_id\": 1,\r\n    \"layout\": \"2-2\",\r\n    \"seats\": [\r\n      { \"no\": \"1A\", \"status\": \"available\" },\r\n      { \"no\": \"1B\", \"status\": \"taken\" },\r\n      { \"no\": \"2A\", \"status\": \"available\" },\r\n      { \"no\": \"2B\", \"status\": \"available\" },\r\n      { \"no\": \"3A\", \"status\": \"taken\" }\r\n    ]\r\n  }\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "7a21adbf-21e2-4a1e-a071-7e2c951dde85",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "payment/methods",
+      "responses": [
+        {
+          "uuid": "46c98706-61fb-4fb1-bd95-e332f4b1a982",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Metode pembayaran tersedia\",\r\n  \"data\": [\r\n    { \"id\": 1, \"nama\": \"Transfer BCA\", \"icon\": \"https://example.com/bca.png\" },\r\n    { \"id\": 2, \"nama\": \"GoPay\", \"icon\": \"https://example.com/gopay.png\" },\r\n    { \"id\": 3, \"nama\": \"OVO\", \"icon\": \"https://example.com/ovo.png\" }\r\n  ]\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "4b416801-aa21-405c-8c2e-520fbc02c7ba",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "pesanan/booking",
+      "responses": [
+        {
+          "uuid": "93d6f84b-7fa7-4cb7-bc7d-520ff1ca47f4",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Pemesanan berhasil diproses!\",\r\n  \"data\": {\r\n    \"booking_id\": \"VTR-778899\",\r\n    \"total_bayar\": 380000,\r\n    \"batas_waktu\": \"2024-05-20 20:00:00\"\r\n  }\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "70bfb7d2-688f-44c5-a382-5e428b75a764",
+          "body": "{\r\n  \"status\": \"error\",\r\n  \"message\": \"Gagal! Anda belum memilih nomor kursi.\",\r\n  \"data\": null\r\n}",
+          "latency": 0,
+          "statusCode": 400,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "body",
+              "modifier": "nomor_kursi",
+              "value": "",
+              "invert": false,
+              "operator": "null"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "f46e8560-e68a-4c3f-90d8-28e799e7a531",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "destinasi/populer",
+      "responses": [
+        {
+          "uuid": "edc81f59-1a9b-4177-b9a5-41390e997cad",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Destinasi populer berhasil dimuat\",\r\n  \"data\": [\r\n    { \"id\": 1, \"kota\": \"Bali\", \"gambar\": \"https://images.unsplash.com/photo-1537996194471-e657df975ab4\" },\r\n    { \"id\": 2, \"kota\": \"Yogyakarta\", \"gambar\": \"https://images.unsplash.com/photo-1584810359583-96fc3448beaa\" }\r\n  ]\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "559ace89-c6ea-4f17-9fb3-2edc282f0192",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "user/update",
+      "responses": [
+        {
+          "uuid": "cd09a3ab-474c-46e7-a6f0-1428dad6ec49",
+          "body": "{\r\n  \"status\": \"success\",\r\n  \"message\": \"Profil berhasil diperbarui!\",\r\n  \"data\": {\r\n    \"nama_lengkap\": \"Andi Pratama Updated\",\r\n    \"no_telp\": \"08123456789\",\r\n    \"email\": \"andi@gmail.com\"\r\n  }\r\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "d63db538-7d07-48ce-9c70-83f35448d055",
+          "body": "{\r\n  \"status\": \"error\",\r\n  \"message\": \"Gagal memperbarui! Nomor telepon harus diawali dengan 08.\",\r\n  \"data\": null\r\n}",
+          "latency": 0,
+          "statusCode": 400,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "body",
+              "modifier": "no_telp",
+              "value": "^08",
+              "invert": true,
+              "operator": "regex"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "a5946121-cf82-4501-875b-5509d4b81799"
+    },
+    {
+      "type": "route",
+      "uuid": "a14689d2-0f45-4732-a8cd-85373058532b"
+    },
+    {
+      "type": "route",
+      "uuid": "8b4ec9b4-8d79-43db-aecd-522fed0d3494"
+    },
+    {
+      "type": "route",
+      "uuid": "76daacdd-5a4f-4a0c-b285-82688cfcf9f0"
+    },
+    {
+      "type": "route",
+      "uuid": "9e4e5aff-a7db-46c6-b4ee-aba75447cdf5"
+    },
+    {
+      "type": "route",
+      "uuid": "4d296022-b119-48f2-8fc5-83eb70e1c626"
+    },
+    {
+      "type": "route",
+      "uuid": "6188934d-dafd-4e5f-9296-7e91e8762a96"
+    },
+    {
+      "type": "route",
+      "uuid": "7a21adbf-21e2-4a1e-a071-7e2c951dde85"
+    },
+    {
+      "type": "route",
+      "uuid": "4b416801-aa21-405c-8c2e-520fbc02c7ba"
+    },
+    {
+      "type": "route",
+      "uuid": "f46e8560-e68a-4c3f-90d8-28e799e7a531"
+    },
+    {
+      "type": "route",
+      "uuid": "559ace89-c6ea-4f17-9fb3-2edc282f0192"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}
