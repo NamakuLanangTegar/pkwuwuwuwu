@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vtr/core/app_theme.dart';
 import 'package:vtr/screens/booking_detail_screen.dart';
+import 'package:vtr/services/api_service.dart';
 
-class SearchResultScreen extends StatelessWidget {
+class SearchResultScreen extends StatefulWidget {
   final String asal;
   final String tujuan;
   final String tanggal;
@@ -15,69 +16,65 @@ class SearchResultScreen extends StatelessWidget {
     required this.tanggal,
   });
 
-  // Static dummy data – no API call needed
-  static final List<Map<String, dynamic>> _staticResults = [
-    {
-      'id': 1,
-      'kategori': 'Bis',
-      'nama_pu': '27 Trans',
-      'tipe': 'President Class',
-      'image': 'https://blue.kumparan.com/image/upload/v1634025431/bus-27-trans.jpg',
-      'asal': 'Malang',
-      'tujuan': 'Jakarta',
-      'berangkat': '18:30',
-      'sampai': '06:00',
-      'harga': 380000,
-      'harga_formatted': 'Rp 380.000',
-      'rating': 4.9,
-      'sisa_kursi': 4,
-    },
-    {
-      'id': 2,
-      'kategori': 'Travel',
-      'nama_pu': 'M-Trans',
-      'tipe': 'Hiace Luxury',
-      'image': 'https://example.com/mtrans.jpg',
-      'asal': 'Malang',
-      'tujuan': 'Kediri',
-      'berangkat': '07:00',
-      'sampai': '09:30',
-      'harga': 85000,
-      'harga_formatted': 'Rp 85.000',
-      'rating': 4.7,
-      'sisa_kursi': 8,
-    },
-    {
-      'id': 3,
-      'kategori': 'Rental',
-      'nama_pu': 'Arbi Rental',
-      'tipe': 'Innova Reborn',
-      'image': 'https://example.com/innova.jpg',
-      'asal': 'Yogyakarta',
-      'tujuan': 'Sleman',
-      'berangkat': '08:00',
-      'sampai': '20:00',
-      'harga': 650000,
-      'harga_formatted': 'Rp 650.000',
-      'rating': 4.8,
-      'sisa_kursi': 1,
-    },
-    {
-      'id': 4,
-      'kategori': 'Bis',
-      'nama_pu': 'Juragan 99',
-      'tipe': 'Premium Class',
-      'image': '',
-      'asal': 'Surabaya',
-      'tujuan': 'Jakarta',
-      'berangkat': '19:00',
-      'sampai': '07:00',
-      'harga': 420000,
-      'harga_formatted': 'Rp 420.000',
-      'rating': 4.8,
-      'sisa_kursi': 6,
-    },
-  ];
+  @override
+  State<SearchResultScreen> createState() => _SearchResultScreenState();
+}
+
+class _SearchResultScreenState extends State<SearchResultScreen> {
+  final ApiService _apiService = ApiService();
+  List<dynamic> _allResults = [];
+  List<dynamic> _filteredResults = [];
+  bool _isLoading = true;
+  String _selectedCategory = 'Semua';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadResults();
+  }
+
+  Future<void> _loadResults() async {
+    final result = await _apiService.getTravelList();
+    if (mounted) {
+      setState(() {
+        if (result['status'] == 'success') {
+          _allResults = result['data'];
+          _applyFilter();
+        }
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _applyFilter() {
+    setState(() {
+      if (_selectedCategory == 'Semua') {
+        _filteredResults = List.from(_allResults);
+      } else {
+        _filteredResults = _allResults
+            .where((item) => item['kategori'] == _selectedCategory)
+            .toList();
+      }
+    });
+  }
+
+  void _selectCategory(String category) {
+    _selectedCategory = category;
+    _applyFilter();
+  }
+
+  IconData _getCategoryIcon(String kategori) {
+    switch (kategori) {
+      case 'Bis':
+        return Icons.directions_bus_rounded;
+      case 'Travel':
+        return Icons.airport_shuttle_rounded;
+      case 'Rental':
+        return Icons.car_rental_rounded;
+      default:
+        return Icons.directions_bus_rounded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +91,7 @@ class SearchResultScreen extends StatelessWidget {
               style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
             ),
             Text(
-              '$asal - $tujuan',
+              '${widget.asal} - ${widget.tujuan}',
               style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12),
             ),
           ],
@@ -111,25 +108,52 @@ class SearchResultScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                _filterChip('Ekonomi', true),
-                const SizedBox(width: 10),
-                _filterChip('Bisnis', false),
-                const SizedBox(width: 10),
-                _filterChip('Eksekutif', false),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _filterChip('Semua', _selectedCategory == 'Semua'),
+                  const SizedBox(width: 10),
+                  _filterChip('Bis', _selectedCategory == 'Bis'),
+                  const SizedBox(width: 10),
+                  _filterChip('Travel', _selectedCategory == 'Travel'),
+                  const SizedBox(width: 10),
+                  _filterChip('Rental', _selectedCategory == 'Rental'),
+                ],
+              ),
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              physics: const BouncingScrollPhysics(),
-              itemCount: _staticResults.length,
-              itemBuilder: (context, index) {
-                return _buildResultCard(context, _staticResults[index]);
-              },
-            ),
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppTheme.primaryColor),
+                  )
+                : _filteredResults.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.search_off_rounded, size: 80, color: Colors.grey.shade300),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Tidak ada jadwal tersedia',
+                              style: GoogleFonts.outfit(color: Colors.grey, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadResults,
+                        color: AppTheme.primaryColor,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: _filteredResults.length,
+                          itemBuilder: (context, index) {
+                            return _buildResultCard(context, _filteredResults[index]);
+                          },
+                        ),
+                      ),
           ),
         ],
       ),
@@ -137,19 +161,26 @@ class SearchResultScreen extends StatelessWidget {
   }
 
   Widget _filterChip(String label, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? AppTheme.primaryColor : Colors.white,
-        border: Border.all(color: AppTheme.primaryColor),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.outfit(
-          color: isSelected ? Colors.white : AppTheme.primaryColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
+    return GestureDetector(
+      onTap: () => _selectCategory(label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryColor : Colors.white,
+          border: Border.all(color: AppTheme.primaryColor),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isSelected
+              ? [BoxShadow(color: AppTheme.primaryColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3))]
+              : [],
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.outfit(
+            color: isSelected ? Colors.white : AppTheme.primaryColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
         ),
       ),
     );
@@ -172,39 +203,70 @@ class SearchResultScreen extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppTheme.lightTeal,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.directions_bus_rounded, color: AppTheme.primaryColor),
+                  child: Icon(_getCategoryIcon(item['kategori'] ?? 'Bis'), color: AppTheme.primaryColor),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item['nama_pu'], style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18)),
-                      Text(item['tipe'], style: GoogleFonts.outfit(color: Colors.grey, fontSize: 12)),
+                      Text(item['nama_pu'] ?? '', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18)),
+                      Text(item['tipe'] ?? '', style: GoogleFonts.outfit(color: Colors.grey, fontSize: 12)),
                     ],
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(item['harga_formatted'], style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.primaryColor, fontSize: 16)),
+                    Text(item['harga_formatted'] ?? '', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.primaryColor, fontSize: 16)),
                     Text('/ Kursi', style: GoogleFonts.outfit(color: Colors.grey, fontSize: 10)),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
+            // Rating & Sisa Kursi
+            Row(
+              children: [
+                Icon(Icons.star_rounded, color: Colors.amber.shade700, size: 18),
+                const SizedBox(width: 4),
+                Text(
+                  '${item['rating'] ?? 0}',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(width: 15),
+                Icon(Icons.event_seat_rounded, color: Colors.grey.shade500, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  '${item['sisa_kursi'] ?? 0} kursi tersisa',
+                  style: GoogleFonts.outfit(color: Colors.grey, fontSize: 12),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightTeal,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    item['kategori'] ?? '',
+                    style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 11),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _timeInfo(item['berangkat'], item['asal']),
+                _timeInfo(item['berangkat'] ?? '', item['asal'] ?? ''),
                 const Icon(Icons.arrow_forward_rounded, color: AppTheme.primaryColor, size: 20),
-                _timeInfo(item['sampai'], item['tujuan']),
+                _timeInfo(item['sampai'] ?? '', item['tujuan'] ?? ''),
               ],
             ),
             const SizedBox(height: 20),
@@ -223,7 +285,10 @@ class SearchResultScreen extends StatelessWidget {
                   minimumSize: const Size(double.infinity, 44),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('Pesan Tiket'),
+                child: Text(
+                  item['kategori'] == 'Rental' ? 'Pesan Rental' : 'Pesan Tiket',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],

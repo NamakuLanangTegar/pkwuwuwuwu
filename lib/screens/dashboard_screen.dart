@@ -21,6 +21,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   
   List<dynamic> _travelList = [];
   List<dynamic> _destinasiPopuler = [];
+  List<dynamic> _messages = [];
+  int _unreadCount = 0;
   bool _isLoading = true;
   int _currentBannerIndex = 0;
   final PageController _bannerController = PageController();
@@ -63,11 +65,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _loadData() async {
     final travelRes = await _apiService.getTravelList();
     final destinasiRes = await _apiService.getDestinasiPopuler();
+    final messagesRes = await _apiService.getUserMessages();
 
     if (mounted) {
       setState(() {
         if (travelRes['status'] == 'success') _travelList = travelRes['data'];
         if (destinasiRes['status'] == 'success') _destinasiPopuler = destinasiRes['data'];
+        if (messagesRes['status'] == 'success' && messagesRes['data'] != null) {
+          _messages = messagesRes['data'];
+          _unreadCount = _messages.where((m) => m['is_read'] == false).length;
+        }
         _isLoading = false;
       });
     }
@@ -81,6 +88,224 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _tujuanController.dispose();
     _tanggalController.dispose();
     super.dispose();
+  }
+
+  void _showNotificationsSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Notifikasi',
+                      style: GoogleFonts.outfit(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryColor,
+                      ),
+                    ),
+                    if (_unreadCount > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '$_unreadCount baru',
+                          style: GoogleFonts.outfit(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+              Expanded(
+                child: _messages.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.notifications_off_outlined, size: 60, color: Colors.grey.shade300),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Belum ada notifikasi',
+                              style: GoogleFonts.outfit(color: Colors.grey, fontSize: 15),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _messages.length,
+                        itemBuilder: (context, index) {
+                          final msg = _messages[index];
+                          bool isUnread = msg['is_read'] == false;
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isUnread ? AppTheme.lightTeal.withOpacity(0.5) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isUnread ? AppTheme.primaryColor.withOpacity(0.3) : Colors.grey.shade200,
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isUnread
+                                        ? AppTheme.primaryColor.withOpacity(0.1)
+                                        : Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    isUnread ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
+                                    color: isUnread ? AppTheme.primaryColor : Colors.grey,
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              msg['judul'] ?? '',
+                                              style: GoogleFonts.outfit(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                                color: isUnread ? AppTheme.primaryColor : Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                          if (isUnread)
+                                            Container(
+                                              width: 8,
+                                              height: 8,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        msg['isi'] ?? '',
+                                        style: GoogleFonts.outfit(color: Colors.grey.shade600, fontSize: 12),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        msg['waktu'] ?? '',
+                                        style: GoogleFonts.outfit(color: Colors.grey, fontSize: 11),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showMessagesSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.5,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Pesan',
+                    style: GoogleFonts.outfit(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.chat_bubble_outline_rounded, size: 60, color: Colors.grey.shade300),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Belum ada pesan masuk',
+                        style: GoogleFonts.outfit(color: Colors.grey, fontSize: 15),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -143,9 +368,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.primaryColor, size: 28),
-            onPressed: () {},
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.primaryColor, size: 28),
+                onPressed: _showNotificationsSheet,
+              ),
+              if (_unreadCount > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$_unreadCount',
+                        style: GoogleFonts.outfit(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           Text(
             'VaTeRo',
@@ -158,7 +406,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.chat_bubble_outline_rounded, color: AppTheme.primaryColor, size: 24),
-            onPressed: () {},
+            onPressed: _showMessagesSheet,
           ),
         ],
       ),
@@ -450,7 +698,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
+            // Rating row
+            Row(
+              children: [
+                Icon(Icons.star_rounded, color: Colors.amber.shade700, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  '${item['rating'] ?? 0}',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+                const SizedBox(width: 10),
+                Icon(Icons.event_seat_rounded, size: 14, color: Colors.grey.shade500),
+                const SizedBox(width: 4),
+                Text(
+                  '${item['sisa_kursi']} kursi',
+                  style: GoogleFonts.outfit(color: Colors.grey, fontSize: 11),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
